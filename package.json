@@ -7,9 +7,10 @@
   "type": "module",
   "scripts": {
     "dev": "wrangler dev",
-    "types": "wrangler types worker-configuration.d.ts",
+    "types": "wrangler types",
     "build": "astro build",
-    "deploy": "pnpm run types && pnpm run build && wrangler deploy"
+    "deploy": "pnpm run types && pnpm run build && pnpm run migrate:remote && wrangler deploy",
+    "migrate:remote": "wrangler d1 migrations apply DB --remote",
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
