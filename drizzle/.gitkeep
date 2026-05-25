@@ -1,0 +1,8 @@
+# Drizzle Migrations Directory
+
+This directory contains D1 database migration files managed by Wrangler.
+
+For more information, see:
+- https://developers.cloudflare.com/d1/reference/migrations/
+- https://orm.drizzle.team/docs/migrations
+

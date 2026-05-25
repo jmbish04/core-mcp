@@ -8,7 +8,8 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "pnpm run types && wrangler deploy",
-    "types": "wrangler types worker-configuration.d.ts"
+    "types": "wrangler types worker-configuration.d.ts",
+    "migrate:db": "wrangler d1 migrations apply DB --remote"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
