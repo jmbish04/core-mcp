@@ -43,6 +43,15 @@
       "remote": true,
     },
   ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "MCP_BROKER_AGENT",
+        "class_name": "McpBrokerAgent",
+        "script_name": "core-mcp"
+      }
+    ]
+  },
   "kv_namespaces": [
     {
       "binding": "KV",
