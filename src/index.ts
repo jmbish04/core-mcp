@@ -2,6 +2,9 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { DrizzleLogger } from "./utils/logger";
+import { createApiRouter } from "./backend/api/index";
+import { routeAgentRequest } from "agents";
+import { McpBrokerAgent } from "./backend/agents/McpBrokerAgent";
 
 /**
  * Creates the consolidated MCP Server handling Shadcn UI, Shoogle Dev, and Cloudflare Docs
@@ -24,7 +27,7 @@ const createServer = () => {
       try {
         const response = await fetch(`https://ui.shadcn.com/registry/styles/default/${component}.json`);
         if (!response.ok) throw new Error(`Component '${component}' not found in registry`);
-        
+
         const data = await response.json();
         return {
           content: [{ type: "text", text: JSON.stringify(data, null, 2) }]
@@ -41,9 +44,9 @@ const createServer = () => {
   server.tool(
     "consult_astro_frontend",
     "Provides best practices for implementing Shadcn (React) within Astro on Cloudflare",
-    { 
+    {
       pattern: z.enum(["hydration", "styling", "deployment"]),
-      componentName: z.string().optional() 
+      componentName: z.string().optional()
     },
     async ({ pattern, componentName }) => {
       const guidelines = {
@@ -84,7 +87,7 @@ const createServer = () => {
 
         if (!response.ok) throw new Error("Failed to interact with upstream Shoogle MCP platform");
         const data: any = await response.json();
-        
+
         return {
           content: [{ type: "text", text: JSON.stringify(data?.result || data, null, 2) }]
         };
@@ -110,7 +113,7 @@ const createServer = () => {
         const url = `https://developers.cloudflare.com/${product}/llms-full.txt`;
         const response = await fetch(url);
         if (!response.ok) throw new Error(`Could not access structural reference file for product: ${product}`);
-        
+
         const rawText = await response.text();
         return {
           content: [{ type: "text", text: rawText.substring(0, 75000) }]
@@ -143,51 +146,77 @@ function withCors(response: Response): Response {
 }
 
 export default {
-  fetch: async (request: Request, env: Env, _ctx: ExecutionContext): Promise<Response> => {
+  fetch: async (request: Request, env: Env, ctx: ExecutionContext): Promise<Response> => {
     if (request.method === "OPTIONS") {
       return new Response(null, { headers: corsHeaders });
     }
 
-    const logId = crypto.randomUUID();
-    let requestBodyClone = "";
-    
-    if (request.method === "POST") {
-      const clone = request.clone();
-      try {
-        requestBodyClone = await clone.text();
-      } catch (error) {
-        console.log(error);
+    const url = new URL(request.url);
+
+    // Route /api/* to Hono
+    if (url.pathname.startsWith("/api/")) {
+      const apiRouter = createApiRouter();
+      return apiRouter.fetch(request, env, ctx);
+    }
+
+    // Route /protocol/* to Agents SDK
+    if (url.pathname.startsWith("/protocol/")) {
+      return routeAgentRequest(request, env, ctx, McpBrokerAgent);
+    }
+
+    // Route /mcp to legacy MCP server
+    if (url.pathname === "/mcp") {
+      const logId = crypto.randomUUID();
+      let requestBodyClone = "";
+
+      if (request.method === "POST") {
+        const clone = request.clone();
+        try {
+          requestBodyClone = await clone.text();
+        } catch (error) {
+          console.log(error);
+        }
       }
-    }
 
-    const transport = new WebStandardStreamableHTTPServerTransport();
-    const server = createServer();
-    server.connect(transport);
+      const transport = new WebStandardStreamableHTTPServerTransport();
+      const server = createServer();
+      server.connect(transport);
 
-    const baseResponse = await transport.handleRequest(request);
-    
-    let responseBodyClone = "";
-    if (baseResponse.body) {
-      const resClone = baseResponse.clone();
-      try {
-        responseBodyClone = await resClone.text();
-      } catch (error) {
-        console.log(error);
+      const baseResponse = await transport.handleRequest(request);
+
+      let responseBodyClone = "";
+      if (baseResponse.body) {
+        const resClone = baseResponse.clone();
+        try {
+          responseBodyClone = await resClone.text();
+        } catch (error) {
+          console.log(error);
+        }
       }
+
+      // Capture telemetry logs through the DrizzleLogger class
+      if (request.method === "POST") {
+        const logger = new DrizzleLogger(env.DB);
+        await logger.logInteraction({
+          id: logId,
+          method: request.method,
+          requestPayload: requestBodyClone,
+          responsePayload: responseBodyClone,
+          statusCode: baseResponse.status
+        });
+      }
+
+      return withCors(baseResponse);
     }
 
-    // Capture telemetry logs through the DrizzleLogger class
-    if (request.method === "POST") {
-      const logger = new DrizzleLogger(env.DB);
-      await logger.logInteraction({
-        id: logId,
-        method: request.method,
-        requestPayload: requestBodyClone,
-        responsePayload: responseBodyClone,
-        statusCode: baseResponse.status
-      });
+    // Default: serve static assets or Astro pages
+    if (env.ASSETS) {
+      return env.ASSETS.fetch(request);
     }
 
-    return withCors(baseResponse);
+    return new Response("Not found", { status: 404 });
   }
 };
+
+// Export Durable Object class
+export { McpBrokerAgent };

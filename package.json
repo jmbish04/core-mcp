@@ -7,19 +7,39 @@
   "type": "module",
   "scripts": {
     "dev": "wrangler dev",
-    "deploy": "pnpm run types && wrangler deploy",
-    "types": "wrangler types worker-configuration.d.ts"
+    "types": "wrangler types worker-configuration.d.ts",
+    "build": "astro build",
+    "deploy": "pnpm run types && pnpm run build && wrangler deploy"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
     "agents": "^0.13.2",
     "drizzle-orm": "^0.30.10",
-    "zod": "^3.25.76"
+    "zod": "^3.25.76",
+    "@cloudflare/ai-chat": "^0.2.24",
+    "@astrojs/cloudflare": "^11.3.0",
+    "@astrojs/react": "^3.6.2",
+    "@hono/zod-openapi": "^0.16.4",
+    "@tanstack/react-table": "^8.20.5",
+    "ai": "^4.0.40",
+    "assistant-ui": "^0.6.2",
+    "astro": "^5.2.3",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "hono": "^4.7.6",
+    "lucide-react": "^0.460.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwind-merge": "^2.5.5",
+    "tailwindcss": "^3.4.17",
+    "workers-ai-provider": "^0.0.18"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260525.1",
     "drizzle-kit": "^0.21.4",
     "typescript": "^5.9.3",
-    "wrangler": "^4.94.0"
+    "wrangler": "^4.94.0",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5"
   }
 }
