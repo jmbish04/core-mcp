@@ -7,8 +7,8 @@ This gives you full control over the transport layer. If you want a simpler appr
 ## Usage
 
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm run dev
 ```
 
 ## Testing
@@ -35,24 +35,42 @@ This MCP server is designed to be deployed on Cloudflare Workers using the Agent
 ### Deploy to Production
 
 ```bash
-npm run deploy
+pnpm run deploy
 ```
 
 This will:
-1. Generate TypeScript types using `wrangler types`
+1. Generate TypeScript types using `wrangler types worker-configuration.d.ts`
 2. Deploy your MCP server to Cloudflare Workers
 
 Your MCP server will be available at `https://your-worker.your-account.workers.dev/mcp`
 
 ### Type Generation
 
-The project uses `wrangler types` to generate TypeScript definitions for your Worker's environment bindings. This ensures type safety for:
-- Environment variables and bindings (KV, D1, AI, etc.)
-- Runtime types based on your `compatibility_date` and `compatibility_flags`
+The project uses `wrangler types` to generate TypeScript definitions in `worker-configuration.d.ts`. This provides:
+
+- **Environment bindings** (KV, D1, AI, BROWSER, ASSETS, etc.) as a global `Env` interface
+- **Runtime types** based on your `compatibility_date` and `compatibility_flags`
+- **No imports required** - The `Env` interface is globally available throughout your codebase
 
 To regenerate types after changing `wrangler.jsonc`:
 ```bash
-npm run types
+pnpm run types
+```
+
+The generated `worker-configuration.d.ts` file:
+- Defines a global `Env` interface that's automatically available in all TypeScript files
+- Includes all Cloudflare Workers runtime types matching your Worker's configuration
+- Replaces the deprecated `@cloudflare/workers-types` package
+
+You can access environment bindings without importing:
+```typescript
+export default {
+  async fetch(request: Request, env: Env): Promise<Response> {
+    // env.KV, env.DB, env.AI, etc. are all typed and available
+    const value = await env.KV.get("key");
+    return new Response(value);
+  }
+}
 ```
 
 ### Continuous Deployment
