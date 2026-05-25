@@ -6,7 +6,7 @@
     "moduleResolution": "Bundler",
     "jsx": "react-jsx",
     "jsxImportSource": "react",
-    "types": ["@cloudflare/workers-types", "./worker-configuration.d.ts", "node"],
+    "types": ["./worker-configuration.d.ts", "node"],
     "paths": {
       "@/*": ["src/frontend/*", "src/backend/*"],
       "@/backend/*": ["src/backend/*"],
