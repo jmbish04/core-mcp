@@ -1,24 +1,25 @@
 {
   "name": "@cloudflare/agents-mcp-server",
   "description": "zero config stateless MCP Server on Cloudflare",
+  "author": "Matt Carey <mcarey@cloudflare.com>",
   "version": "0.0.1",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "bun run types && bun x wrangler deploy",
-    "types": "bun x wrangler types env.d.ts --include-runtime false"
+    "types": "bun x wrangler types"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.5.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "agents": "*",
-    "drizzle-orm": "^0.30.0",
-    "zod": "^3.23.8"
+    "drizzle-orm": "^0.30.10",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20240512.0",
-    "drizzle-kit": "^0.21.0",
-    "typescript": "^5.4.5",
-    "wrangler": "^3.57.1"
+    "@cloudflare/workers-types": "^4.20260525.1",
+    "drizzle-kit": "^0.21.4",
+    "typescript": "^5.9.3",
+    "wrangler": "^3.114.17"
   }
 }
