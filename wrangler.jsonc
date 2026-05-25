@@ -1,11 +1,58 @@
 {
-  "compatibility_date": "2026-01-28",
+  "name": "core-mcp",
+  "compatibility_date": "2026-05-23",
   "compatibility_flags": ["nodejs_compat"],
   "main": "src/index.ts",
-  "name": "mcp-server",
+ "upload_source_maps": true,
+  "workers_dev": true,
+  "preview_urls": true,
   "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1,
     "logs": {
-      "enabled": true
-    }
-  }
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "persist": true,
+      "invocation_logs": true,
+    },
+    "traces": {
+      "enabled": true,
+      "persist": true,
+      "head_sampling_rate": 1,
+    },
+  },
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "./dist",
+    "run_worker_first": true,
+    "not_found_handling": "none",
+  },
+  "ai": {
+    "binding": "AI",
+    "remote": true,
+  },
+  "browser": {
+    "binding": "BROWSER",
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "core-mcp",
+      "database_id": "3e6203e0-c07b-4ad7-8224-1d906d427e2e",
+      "migrations_dir": "drizzle",
+      "remote": true,
+    },
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "KV",
+      "id": "46922d2d07e5466c8f75c183a0937739",
+      "remote": true,
+    },
+    {
+      "binding": "SESSIONS",
+      "id": "bfb44677adfb487aa592b83a24e36d3f",
+      "remote": true,
+    },
+  ],
 }
