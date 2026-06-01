@@ -1,0 +1,19 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ConfigPanel from '../components/ConfigPanel';
+---
+
+<Layout title="Configuration - MCP Broker">
+  <main class="container mx-auto p-8">
+    <div class="space-y-8">
+      <div>
+        <h1 class="text-4xl font-bold tracking-tight">Configuration Panel</h1>
+        <p class="text-muted-foreground mt-2">
+          Manage best practices and review HITL proposals
+        </p>
+      </div>
+
+      <ConfigPanel client:load />
+    </div>
+  </main>
+</Layout>

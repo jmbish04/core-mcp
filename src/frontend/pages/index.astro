@@ -1,0 +1,113 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="MCP Broker - Dashboard">
+  <main class="container mx-auto p-8">
+    <div class="space-y-8">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-4xl font-bold tracking-tight">MCP Broker Dashboard</h1>
+          <p class="text-muted-foreground mt-2">
+            High-performance edge system running on Cloudflare Workers
+          </p>
+        </div>
+        <div class="flex gap-4">
+          <a
+            href="/config"
+            class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+          >
+            Configuration
+          </a>
+          <a
+            href="/chat"
+            class="inline-flex items-center justify-center rounded-md bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground hover:bg-secondary/80 transition-colors"
+          >
+            Research Chat
+          </a>
+        </div>
+      </div>
+
+      <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div class="rounded-lg border bg-card p-6 text-card-foreground">
+          <div class="flex flex-row items-center justify-between space-y-0 pb-2">
+            <h3 class="text-sm font-medium">Active MCP Tools</h3>
+            <svg class="h-4 w-4 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div class="text-2xl font-bold">3</div>
+          <p class="text-xs text-muted-foreground">Shadcn, Shoogle, CF Docs</p>
+        </div>
+
+        <div class="rounded-lg border bg-card p-6 text-card-foreground">
+          <div class="flex flex-row items-center justify-between space-y-0 pb-2">
+            <h3 class="text-sm font-medium">Best Practices</h3>
+            <svg class="h-4 w-4 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="text-2xl font-bold" id="best-practices-count">Loading...</div>
+          <p class="text-xs text-muted-foreground">Active guidance rules</p>
+        </div>
+
+        <div class="rounded-lg border bg-card p-6 text-card-foreground">
+          <div class="flex flex-row items-center justify-between space-y-0 pb-2">
+            <h3 class="text-sm font-medium">HITL Proposals</h3>
+            <svg class="h-4 w-4 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div class="text-2xl font-bold" id="hitl-proposals-count">Loading...</div>
+          <p class="text-xs text-muted-foreground">Pending approval</p>
+        </div>
+
+        <div class="rounded-lg border bg-card p-6 text-card-foreground">
+          <div class="flex flex-row items-center justify-between space-y-0 pb-2">
+            <h3 class="text-sm font-medium">System Health</h3>
+            <svg class="h-4 w-4 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          </div>
+          <div class="text-2xl font-bold" id="health-status">Loading...</div>
+          <p class="text-xs text-muted-foreground">All systems operational</p>
+        </div>
+      </div>
+
+      <div class="rounded-lg border bg-card p-6">
+        <h2 class="text-2xl font-bold mb-4">Quick Links</h2>
+        <div class="grid gap-4 md:grid-cols-3">
+          <a href="/api/openapi.json" target="_blank" class="block p-4 rounded-lg border hover:bg-accent transition-colors">
+            <h3 class="font-semibold mb-2">OpenAPI Schema</h3>
+            <p class="text-sm text-muted-foreground">View the complete API specification</p>
+          </a>
+          <a href="/api/health" target="_blank" class="block p-4 rounded-lg border hover:bg-accent transition-colors">
+            <h3 class="font-semibold mb-2">Health Endpoint</h3>
+            <p class="text-sm text-muted-foreground">Check system health and tool status</p>
+          </a>
+          <a href="/config" class="block p-4 rounded-lg border hover:bg-accent transition-colors">
+            <h3 class="font-semibold mb-2">Configuration Panel</h3>
+            <p class="text-sm text-muted-foreground">Manage best practices and proposals</p>
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  async function loadDashboardData() {
+    try {
+      const [bestPractices, hitlProposals, health] = await Promise.all([
+        fetch('/api/best-practices').then(r => r.json()),
+        fetch('/api/hitl-proposals').then(r => r.json()),
+        fetch('/api/health').then(r => r.json())
+      ]);
+
+      document.getElementById('best-practices-count')!.textContent = String(bestPractices.length);
+
+      const pending = hitlProposals.filter((p: any) => p.status === 'pending').length;
+      document.getElementById('hitl-proposals-count')!.textContent = String(pending);
+
+      const statusEl = document.getElementById('health-status')!;
+      statusEl.textContent = health.status === 'healthy' ? '✓ Healthy' : '✗ Unhealthy';
+      statusEl.className = `text-2xl font-bold ${health.status === 'healthy' ? 'text-green-500' : 'text-red-500'}`;
+    } catch (error) {
+      console.error('Failed to load dashboard data:', error);
+    }
+  }
+
+  loadDashboardData();
+</script>

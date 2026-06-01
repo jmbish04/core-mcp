@@ -1,0 +1,19 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ResearchChat from '../components/ResearchChat';
+---
+
+<Layout title="Research Chat - MCP Broker">
+  <main class="container mx-auto p-8 h-screen flex flex-col">
+    <div class="mb-4">
+      <h1 class="text-3xl font-bold tracking-tight">Research Chat</h1>
+      <p class="text-muted-foreground mt-1">
+        AI-powered chat with access to MCP tools and best practices
+      </p>
+    </div>
+
+    <div class="flex-1 overflow-hidden">
+      <ResearchChat client:load />
+    </div>
+  </main>
+</Layout>
