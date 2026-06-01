@@ -5,9 +5,10 @@ import tailwind from '@astrojs/tailwind';
 
 export default defineConfig({
   output: 'server',
+  srcDir: './src/frontend',
   adapter: cloudflare({
-    platformProxy: {
-      enabled: true
+    runtime: {
+      mode: 'off'
     }
   }),
   integrations: [
